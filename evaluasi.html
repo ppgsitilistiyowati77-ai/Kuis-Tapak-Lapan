@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi Akhir: Tapak Lapan Melayu</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --accent: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f7f6;
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        #timer-box {
+            display: none;
+            position: sticky;
+            top: 10px;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+            width: fit-content;
+            margin: 0 auto 20px auto;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .time-warning {
+            background-color: var(--danger) !important;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0.7; }
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--secondary);
+        }
+        .materi-box {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--accent);
+        }
+        .quiz-section {
+            display: none;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        .options label {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            transition: 0.3s;
+            border: 1px solid transparent;
+        }
+        .options label:hover {
+            background: #eef2f3;
+            border-color: var(--secondary);
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #219150;
+        }
+        #result {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #fff3e0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="materi">
+        <h1>🌿 Evaluasi Akhir: Tapak Lapan</h1>
+        <div class="materi-box">
+            <h3>Instruksi Kuis:</h3>
+            <p>1. Kamu memiliki waktu <b>5 menit (05:00)</b> untuk menjawab semua pertanyaan.</p>
+            <p>2. Ada 5 pertanyaan pilihan ganda terkait materi kemandirian Melayu.</p>
+            <p>3. Jika waktu habis, jawabanmu akan dikirim secara otomatis.</p>
+        </div>
+        <button onclick="startQuiz()">Mulai Kuis Sekarang</button>
+    </div>
+
+    <div id="quiz" class="quiz-section">
+        <div id="timer-box">Sisa Waktu: <span id="time">05:00</span></div>
+        <h2>📝 Soal Evaluasi</h2>
+        <div id="quiz-content"></div>
+        <button id="submit-btn" onclick="calculateScore()">Kirim Jawaban</button>
+    </div>
+    
+    <div id="result"></div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "Apa inti utama dari konsep 'Tapak Lapan' dalam ekonomi Melayu?",
+            options: ["Hanya bekerja di sektor perkebunan", "Memiliki 8 jenis mata pencaharian sebagai cadangan", "Bekerja di 8 negara berbeda", "Mencari bantuan modal dari 8 bank"],
+            a: 1
+        },
+        {
+            q: "Hasil sawah (padi) dalam budaya Melayu disimpan di lumbung sebagai 'asuransi kelaparan'. Hal ini merupakan pilar...",
+            options: ["Aset Masa Depan", "Dana Darurat", "Pangan Pokok (Kedaulatan Perut)", "Kreativitas Jasa"],
+            a: 2
+        },
+        {
+            q: "Mengapa masyarakat Melayu tradisional mengistirahatkan kebun saat 'Musim Mengurak' (daun gugur)?",
+            options: ["Karena mereka ingin pergi berlibur", "Agar tidak menyakiti pohon dan menjaga kualitas getah", "Karena pohon karet mati saat kemarau", "Karena takut ada kebakaran hutan"],
+            a: 1
+        },
+        {
+            q: "Pekerjaan 'Baniro' (ambil nira) dan 'Meramu' (madu hutan) membutuhkan keberanian tinggi dan termasuk dalam level...",
+            options: ["Eka Carana (Ekstraktif)", "Dwi Carana (Produksi)", "Catur Carana (Intelektual)", "Panca Carana (Distribusi)"],
+            a: 0
+        },
+        {
+            q: "Apa pesan moral utama dari sejarah krisis ekonomi tahun 1931 bagi kita saat ini?",
+            options: ["Jangan menanam pohon karet", "Hanya fokus pada satu keahlian saja", "Jangan bergantung pada satu sumber pendapatan (Monokultur)", "Lebih baik tinggal di kota daripada di kampung"],
+            a: 2
+        }
+    ];
+
+    let timerInterval;
+    let timeRemaining = 300; // 5 menit dalam detik
+
+    function startQuiz() {
+        document.getElementById('materi').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+        document.getElementById('timer-box').style.display = 'block';
+        
+        renderQuestions();
+        startTimer();
+    }
+
+    function renderQuestions() {
+        let quizHTML = '';
+        questions.forEach((item, index) => {
+            quizHTML += `
+                <div class="question">
+                    <p><strong>${index + 1}. ${item.q}</strong></p>
+                    <div class="options">
+                        ${item.options.map((opt, i) => `
+                            <label>
+                                <input type="radio" name="q${index}" value="${i}"> ${opt}
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('quiz-content').innerHTML = quizHTML;
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            
+            let minutes = Math.floor(timeRemaining / 60);
+            let seconds = timeRemaining % 60;
+            
+            // Format 00:00
+            document.getElementById('time').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Peringatan jika waktu di bawah 1 menit
+            if (timeRemaining <= 60) {
+                document.getElementById('timer-box').classList.add('time-warning');
+            }
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert("Waktu habis! Jawabanmu akan otomatis dikirim.");
+                calculateScore();
+            }
+        }, 1000);
+    }
+
+    function calculateScore() {
+        clearInterval(timerInterval);
+        let score = 0;
+        
+        questions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected && parseInt(selected.value) === item.a) {
+                score += 20;
+            }
+        });
+
+        // Tampilkan Hasil
+        document.getElementById('quiz').style.display = 'none';
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
+        
+        let pesan = "";
+        if(score >= 80) pesan = "🔥 Luar Biasa! Kamu adalah ahli Kearifan Melayu.";
+        else if(score >= 60) pesan = "👍 Bagus! Kamu memahami dasar-dasar Tapak Lapan.";
+        else pesan = "📚 Ayo baca lagi materinya agar lebih mandiri di masa depan.";
+
+        resultDiv.innerHTML = `
+            <div style="font-size: 50px;">${score >= 60 ? '🎉' : '✍️'}</div>
+            HASIL EVALUASI<br>
+            <span style="font-size: 40px; color: #27ae60;">${score} / 100</span><br>
+            <p>${pesan}</p>
+            <button onclick="location.reload()" style="width: auto; padding: 10px 20px; font-size: 14px; margin: 0 auto;">Ulangi Materi</button>
+        `;
+    }
+</script>
+
+</body>
+</html>
